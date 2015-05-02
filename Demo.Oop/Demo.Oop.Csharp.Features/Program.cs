@@ -15,7 +15,7 @@ namespace Demo.Oop.Csharp.Features
 		public static void Main(string[] args)
 		{
 			IRepository<Employee> employeeRepository = new Repository<Employee>();
-			//DumpPeople(employeeRepository);
+			DumpPeople(employeeRepository);
 		}
 
 		private static void DumpPeople(IRepository<Person> personRepository)
