@@ -2,8 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Demo.Oop.Csharp.Features
 {
@@ -20,24 +18,24 @@ namespace Demo.Oop.Csharp.Features
 					new Employee {EmployeeId = 2, Name = "Bob"},
 					new Employee {EmployeeId = 3, Name = "Cathy"}
 				};
-			DumpPeople(employeeRepository);
 
-			// before using Contravariance
 			AddManagers(employeeRepository);
+			DumpPeople(employeeRepository);
 		}
 
-		private static void AddManagers(IRepository<Manager> employeeRepository)
+		private static void AddManagers(IWriteOnlyRepository<Manager> employeeRepository)
 		{
-			employeeRepository.Add(new Manager
+			var manager = new Manager
 				{
-					Name = "David", 
-					EmployeeId = 4,
-					Underlings =
-						{
-							new Employee {EmployeeId = 1, Name = "Aries"},
-							new Employee {EmployeeId = 2, Name = "Bob"}
-						}
-				});
+				Name = "David", 
+				EmployeeId = 4,
+				Underlings =
+					{
+					new Employee {EmployeeId = 1, Name = "Aries"},
+					new Employee {EmployeeId = 2, Name = "Bob"}
+					}
+				};
+			employeeRepository.Add(manager);
 		}
 
 		/// <summary>
@@ -67,6 +65,11 @@ namespace Demo.Oop.Csharp.Features
 	public class Manager : Employee
 	{
 		public List<Employee> Underlings { get; set; }
+
+		public Manager()
+		{
+			Underlings = new List<Employee>();
+		}
 	}
 
 	public interface IReadOnlyRepository<out T>
@@ -74,10 +77,14 @@ namespace Demo.Oop.Csharp.Features
 		IQueryable<T> FindAll();
 	}
 
-	public interface IRepository<T> : IReadOnlyRepository<T>
+	public interface IWriteOnlyRepository<in T>
 	{
 		void Add(T entity);
 		void Remove(T entity);
+	}
+
+	public interface IRepository<T> : IReadOnlyRepository<T>, IWriteOnlyRepository<T>
+	{
 	}
 
 	public class Repository<T> : IRepository<T>, IEnumerable<T>
