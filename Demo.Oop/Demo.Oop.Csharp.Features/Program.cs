@@ -18,9 +18,26 @@ namespace Demo.Oop.Csharp.Features
 				{
 					new Employee {EmployeeId = 1, Name = "Aries"},
 					new Employee {EmployeeId = 2, Name = "Bob"},
-					new Employee {EmployeeId = 3, Name = "Cathy"},
+					new Employee {EmployeeId = 3, Name = "Cathy"}
 				};
 			DumpPeople(employeeRepository);
+
+			// before using Contravariance
+			AddManagers(employeeRepository);
+		}
+
+		private static void AddManagers(IRepository<Manager> employeeRepository)
+		{
+			employeeRepository.Add(new Manager
+				{
+					Name = "David", 
+					EmployeeId = 4,
+					Underlings =
+						{
+							new Employee {EmployeeId = 1, Name = "Aries"},
+							new Employee {EmployeeId = 2, Name = "Bob"}
+						}
+				});
 		}
 
 		/// <summary>
