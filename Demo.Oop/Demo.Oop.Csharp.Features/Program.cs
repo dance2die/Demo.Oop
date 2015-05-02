@@ -14,11 +14,20 @@ namespace Demo.Oop.Csharp.Features
 	{
 		public static void Main(string[] args)
 		{
-			IRepository<Employee> employeeRepository = new Repository<Employee>();
+			IRepository<Employee> employeeRepository = new Repository<Employee>
+				{
+					new Employee {EmployeeId = 1, Name = "Aries"},
+					new Employee {EmployeeId = 2, Name = "Bob"},
+					new Employee {EmployeeId = 3, Name = "Cathy"},
+				};
 			DumpPeople(employeeRepository);
 		}
 
-		private static void DumpPeople(IRepository<Person> personRepository)
+		/// <summary>
+		/// To test Covariance.
+		/// </summary>
+		/// <param name="personRepository"></param>
+		private static void DumpPeople(IReadOnlyRepository<Person> personRepository)
 		{
 			var people = personRepository.FindAll();
 			foreach (var person in people)
@@ -43,7 +52,18 @@ namespace Demo.Oop.Csharp.Features
 		public List<Employee> Underlings { get; set; }
 	}
 
-	public class Repository<T> : IRepository<T>
+	public interface IReadOnlyRepository<out T>
+	{
+		IQueryable<T> FindAll();
+	}
+
+	public interface IRepository<T> : IReadOnlyRepository<T>
+	{
+		void Add(T entity);
+		void Remove(T entity);
+	}
+
+	public class Repository<T> : IRepository<T>, IEnumerable<T>
 	{
 		private readonly List<T> _entities = new List<T>(); 
 
@@ -61,12 +81,15 @@ namespace Demo.Oop.Csharp.Features
 		{
 			return _entities.AsQueryable();
 		}
-	}
 
-	public interface IRepository<T>
-	{
-		void Add(T entity);
-		void Remove(T entity);
-		IQueryable<T> FindAll();
+		IEnumerator<T> IEnumerable<T>.GetEnumerator()
+		{
+			return _entities.GetEnumerator();
+		}
+
+		public IEnumerator GetEnumerator()
+		{
+			return _entities.GetEnumerator();
+		}
 	}
 }
